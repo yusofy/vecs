@@ -86,6 +86,7 @@ class Client:
         *,
         dimension: Optional[int] = None,
         adapter: Optional[Adapter] = None,
+        schema: Optional[str] = "vecs",
     ) -> Collection:
         """
         Get a vector collection by name, or create it if no collection with
@@ -112,6 +113,7 @@ class Client:
             name=name,
             dimension=dimension or adapter_dimension,  # type: ignore
             client=self,
+            schema=schema,
             adapter=adapter,
         )
 
@@ -182,18 +184,21 @@ class Client:
                 self,
             )
 
-    def list_collections(self) -> List["Collection"]:
+    def list_collections(self, *, schema: Optional[str] = "vecs") -> List["Collection"]:
         """
-        List all vector collections.
+        List all vector collections in a schema.
+
+        Keyword Arguments:
+            schema (str): The schema to list collections from. Defaults to "vecs".
 
         Returns:
             list[Collection]: A list of all collections.
         """
         from vecs.collection import Collection
 
-        return Collection._list_collections(self)
+        return Collection._list_collections(self, schema)
 
-    def delete_collection(self, name: str) -> None:
+    def delete_collection(self, name: str, *, schema: Optional[str] = "vecs") -> None:
         """
         Delete a vector collection.
 
@@ -202,12 +207,15 @@ class Client:
         Args:
             name (str): The name of the collection.
 
+        Keyword Arguments:
+            schema (str): The schema to list collections from. Defaults to "vecs".
+
         Returns:
             None
         """
         from vecs.collection import Collection
 
-        Collection(name, -1, self)._drop()
+        Collection(name, -1, self, schema=schema)._drop()
         return
 
     def disconnect(self) -> None:
